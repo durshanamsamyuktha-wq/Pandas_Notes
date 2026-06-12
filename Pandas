@@ -1,0 +1,247 @@
+# 🐼 Pandas Notes — Complete Cheat Sheet for Data Analytics
+
+A beginner-friendly, well-organized reference for **Pandas** — the most popular Python library for data manipulation and analysis. Every section includes code + explanation. Perfect for quick revision or as a GitHub reference repo. ⭐
+
+---
+
+## 📦 1. Installation & Import
+
+```python
+pip install pandas
+```
+
+```python
+import pandas as pd   # 'pd' is the standard alias used everywhere
+```
+
+> 💡 **Why pandas?** It gives you two powerful structures — `Series` (1D) and `DataFrame` (2D, like an Excel sheet) — to store and analyze data easily.
+
+---
+
+## 🧱 2. Core Data Structures
+
+### 🔹 Series (1D array with labels)
+```python
+s = pd.Series([10, 20, 30, 40])
+print(s)
+```
+👉 Creates a single column of data with an automatic index (0,1,2,3).
+
+### 🔹 DataFrame (2D table)
+```python
+data = {
+    "Name": ["Alice", "Bob", "Charlie"],
+    "Age": [25, 30, 35],
+    "City": ["NY", "LA", "SF"]
+}
+df = pd.DataFrame(data)
+print(df)
+```
+👉 Creates a table-like structure where each **key** becomes a column and each **list value** becomes the rows.
+
+---
+
+## 📂 3. Reading & Writing Data
+
+| Task | Code | Explanation |
+|------|------|-------------|
+| 📥 Read CSV | `df = pd.read_csv("file.csv")` | Loads a CSV file into a DataFrame |
+| 📥 Read Excel | `df = pd.read_excel("file.xlsx")` | Loads an Excel sheet |
+| 📥 Read JSON | `df = pd.read_json("file.json")` | Loads JSON data |
+| 📤 Save CSV | `df.to_csv("out.csv", index=False)` | Saves DataFrame without writing row numbers |
+| 📤 Save Excel | `df.to_excel("out.xlsx", index=False)` | Saves to Excel format |
+
+> ⚠️ `index=False` prevents pandas from adding an extra unwanted index column when saving.
+
+---
+
+## 🔍 4. Exploring Your Data (First Look)
+
+```python
+df.head()       # 👀 First 5 rows
+df.tail(3)      # 👀 Last 3 rows
+df.shape        # 📏 (rows, columns)
+df.columns      # 🏷️ List of column names
+df.info()       # ℹ️ Data types + non-null counts
+df.describe()   # 📊 Statistical summary (mean, std, min, max...)
+df.dtypes       # 🔢 Data type of each column
+```
+
+> 💡 **Always run `df.head()` and `df.info()` first** — this gives you an instant overview of structure, missing values, and data types.
+
+---
+
+## 🎯 5. Selecting Data
+
+```python
+df["Name"]              # 🔹 Select a single column → returns a Series
+df[["Name", "Age"]]      # 🔹 Select multiple columns → returns a DataFrame
+
+df.loc[0]                # 🔹 Select row by LABEL (index name)
+df.iloc[0]               # 🔹 Select row by POSITION (numeric index)
+
+df.loc[0, "Name"]        # 🔹 Specific cell by label
+df.iloc[0, 1]            # 🔹 Specific cell by position
+```
+
+> 🆚 **`loc` vs `iloc`**
+> - `loc` → uses **labels/names** (e.g., "Name", "A")
+> - `iloc` → uses **integer positions** (e.g., 0, 1, 2)
+
+---
+
+## 🧹 6. Filtering Rows (Conditions)
+
+```python
+df[df["Age"] > 25]                       # ✅ Rows where Age > 25
+df[(df["Age"] > 25) & (df["City"]=="NY")] # ✅ Multiple conditions (AND)
+df[(df["Age"] > 25) | (df["City"]=="LA")] # ✅ Multiple conditions (OR)
+df[df["Name"].isin(["Alice","Bob"])]      # ✅ Filter using a list of values
+```
+
+> 🔑 Use `&` for AND, `|` for OR — **not** `and`/`or` — and wrap each condition in `()`.
+
+---
+
+## 🧼 7. Handling Missing Data
+
+```python
+df.isnull()              # ❓ True/False for missing values
+df.isnull().sum()        # 🔢 Count of missing values per column
+
+df.dropna()               # 🗑️ Remove rows with any missing values
+df.fillna(0)              # 🩹 Replace missing values with 0
+df.fillna(df["Age"].mean())  # 🩹 Fill with column average (smart fill)
+```
+
+> ⚠️ **Never blindly drop missing data** — check how much you're losing first with `df.isnull().sum()`.
+
+---
+
+## ✏️ 8. Modifying Data
+
+```python
+df["Salary"] = [50000, 60000, 70000]      # ➕ Add new column
+
+df["Age"] = df["Age"] + 1                  # 🔄 Update existing column
+
+df.rename(columns={"Name": "Full Name"})   # ✏️ Rename column(s)
+
+df.drop("City", axis=1)                    # ❌ Delete a column (axis=1 = column)
+df.drop(0, axis=0)                         # ❌ Delete a row (axis=0 = row)
+```
+
+> 💡 **axis=0** → operates on **rows** | **axis=1** → operates on **columns**
+
+---
+
+## 🔢 9. Sorting & Ranking
+
+```python
+df.sort_values("Age")                     # ⬆️ Sort ascending by Age
+df.sort_values("Age", ascending=False)    # ⬇️ Sort descending
+df.sort_values(["Age","Name"])            # 🔢 Sort by multiple columns
+```
+
+---
+
+## 📊 10. Grouping & Aggregation (Powerful!)
+
+```python
+df.groupby("City")["Salary"].mean()       # 📈 Avg salary per city
+df.groupby("City")["Salary"].sum()        # ➕ Total salary per city
+df.groupby("City").agg({"Salary":"mean", "Age":"max"})  # 🎯 Multiple aggregations
+```
+
+> 🧠 **Think of `groupby` like Excel's PivotTable** — it splits data into groups, applies a function, and combines the results.
+
+---
+
+## 🔗 11. Merging & Combining DataFrames
+
+```python
+pd.concat([df1, df2])                     # ➕ Stack DataFrames (rows on top of rows)
+
+pd.merge(df1, df2, on="ID", how="inner")  # 🔗 SQL-style join on a common column
+```
+
+| `how` value | Meaning |
+|-------------|---------|
+| `inner` | Only matching rows from both ✅ |
+| `left`  | All from left + matches from right ⬅️ |
+| `right` | All from right + matches from left ➡️ |
+| `outer` | Everything from both, fill gaps with NaN 🔄 |
+
+---
+
+## 🧮 12. Useful Built-in Functions
+
+```python
+df["Age"].sum()        # ➕ Total
+df["Age"].mean()        # 📊 Average
+df["Age"].max()         # 🔼 Maximum
+df["Age"].min()         # 🔽 Minimum
+df["Age"].count()       # 🔢 Count non-null values
+df["City"].unique()     # 🆕 Unique values
+df["City"].nunique()    # 🔢 Number of unique values
+df["City"].value_counts()  # 📊 Frequency of each value
+```
+
+---
+
+## 🛠️ 13. Applying Custom Functions
+
+```python
+df["Age_Group"] = df["Age"].apply(lambda x: "Senior" if x > 30 else "Junior")
+```
+👉 `apply()` runs a function on every value in a column — great for custom transformations.
+
+```python
+df.apply(lambda row: row["Age"] * 2, axis=1)  # 🔁 Apply across rows
+```
+
+---
+
+## 📅 14. Working with Dates
+
+```python
+df["Date"] = pd.to_datetime(df["Date"])    # 📆 Convert to datetime format
+df["Year"] = df["Date"].dt.year             # 📆 Extract year
+df["Month"] = df["Date"].dt.month           # 📆 Extract month
+df["Day"] = df["Date"].dt.day               # 📆 Extract day
+```
+
+---
+
+## ⚡ 15. Quick Tips & Best Practices
+
+- ✅ Always inspect data with `head()`, `info()`, and `describe()` before analysis.
+- ✅ Use `copy()` when creating a new DataFrame from a slice → `df2 = df[...].copy()` to avoid warnings.
+- ✅ Chain methods for cleaner code:
+  ```python
+  result = df[df["Age"] > 25].groupby("City")["Salary"].mean().sort_values()
+  ```
+- ✅ Use `df.reset_index(drop=True)` after filtering/sorting to clean up the index.
+- ⚠️ `df["col"] = ...` may trigger a `SettingWithCopyWarning` — use `.loc[]` to be safe:
+  ```python
+  df.loc[df["Age"] > 25, "Status"] = "Adult"
+  ```
+
+---
+
+## 🧭 16. Cheat Sheet Summary Table
+
+| Goal | Function |
+|------|----------|
+| 📥 Load data | `read_csv()`, `read_excel()` |
+| 👀 Preview | `head()`, `tail()`, `info()` |
+| 🎯 Select | `loc[]`, `iloc[]`, `[]` |
+| 🧹 Filter | Boolean conditions `df[df["x"] > 5]` |
+| 🩹 Clean | `dropna()`, `fillna()` |
+| ✏️ Transform | `apply()`, `rename()`, arithmetic |
+| 📊 Aggregate | `groupby()`, `agg()` |
+| 🔗 Combine | `merge()`, `concat()` |
+| 📤 Save | `to_csv()`, `to_excel()` |
+
+
+
